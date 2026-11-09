@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Lora", Georgia, serif;
+  --color-ink: #000000;
+  --color-bg: #000000;
+  --color-fg: #ffffff;
+  --color-card: #131313;
+  --color-card-2: #1b1b1b;
+  --color-line: #2a2a2a;
+  --color-brand: #f26b0d;
+  --color-brand-dark: #d95a05;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-spin-slow: spin 40s linear infinite;
+  --animate-fade-up: fade-up .8s cubic-bezier(.2,.7,.2,1) both;
+  --animate-pop: pop .35s cubic-bezier(.2,.9,.3,1.4) both;
+  --animate-marquee: marquee 30s linear infinite;
+  @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: none } }
+  @keyframes pop { from { opacity: 0; transform: scale(.85) } to { opacity: 1; transform: none } }
+  @keyframes marquee { to { transform: translateX(-50%) } }
+}
+
+html { overscroll-behavior-y: none; }
+body { background: var(--color-bg); color: var(--color-fg); transition: background-color .4s ease, color .4s ease; font-family: var(--font-body); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+h1, h2, h3, h4 { font-family: var(--font-display); }
+::selection { background: var(--color-brand); color: #fff; }
+:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 3px; }
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* scroll reveal */
+.reveal { opacity: 0; transform: translateY(32px); transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0ms); }
+.reveal.in { opacity: 1; transform: none; }
+.reveal-left { transform: translateX(-40px); }
+.reveal-right { transform: translateX(40px); }
+.reveal-zoom { transform: scale(.92); }
+
+/* inputs */
+.field { width: 100%; background: #fff; color: #111; border: 1px solid #e5e5e5; border-radius: .5rem; padding: .7rem .9rem; font-size: .9rem; transition: box-shadow .2s, border-color .2s; }
+.field:focus { outline: none; border-color: var(--color-brand); box-shadow: 0 0 0 3px rgb(242 107 13 / .25); }
+.field.invalid { border-color: #e11d48; }
+.field-dark { background: var(--color-card-2); color: var(--color-fg); border-color: var(--color-line); }
+.field-dark::placeholder { color: color-mix(in oklab, var(--color-fg) 45%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+
+/* routed page enter */
+router-outlet + * { display: block; animation: page-in .55s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes page-in { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: none } }
+@keyframes draw { to { stroke-dashoffset: 0 } }
+.grain { background-image: radial-gradient(ellipse at 70% 30%, var(--grain-1) 0%, var(--grain-2) 45%, var(--grain-3) 100%); }
+.grid-lines { background-image: linear-gradient(color-mix(in oklab, var(--color-fg) 6%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklab, var(--color-fg) 6%, transparent) 1px, transparent 1px); background-size: 28px 28px; }
+
+/* ---------- plate animations (menu / dish cards) ---------- */
+@keyframes plate-spin { to { transform: rotate(360deg) } }
+@keyframes plate-glow { 0%,100% { box-shadow: 0 0 0 0 rgb(242 107 13 / 0), 0 14px 34px -14px #000 } 50% { box-shadow: 0 0 0 6px rgb(242 107 13 / .12), 0 18px 40px -12px rgb(242 107 13 / .45) } }
+@keyframes plate-bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+@keyframes ring-spin { to { transform: rotate(-360deg) } }
+
+.plate-img { transform: rotate(0deg); }
+.plate-spin .plate-img, .plate-spin-rev .plate-img { will-change: transform; }
+/* continuous spin: clockwise / counter-clockwise, each card has its own speed via --dur */
+.plate-spin     .plate-img { animation: plate-spin var(--dur, 24s) linear infinite; }
+.plate-spin-rev .plate-img { animation: plate-spin var(--dur, 30s) linear infinite reverse; }
+/* gentle bobbing + one full turn on hover */
+.plate-float { animation: plate-bob 5s ease-in-out infinite; animation-delay: var(--delay, 0s); }
+.plate-float .plate-img { transition: transform 1.1s cubic-bezier(.2,.7,.2,1); }
+.group:hover .plate-float .plate-img, .plate-float:hover .plate-img, .plate-float:focus-within .plate-img { transform: rotate(360deg) scale(1.04); }
+/* spinning plates also get a soft pulsing glow and a slow dashed orbit ring */
+.plate-spin .plate-frame, .plate-spin-rev .plate-frame { box-shadow: 0 0 0 5px rgb(242 107 13 / .12), 0 16px 34px -14px rgb(242 107 13 / .4); }
+.plate-ring { animation: ring-spin 40s linear infinite; }
+
+/* ================= theme: dark (default) / light ================= */
+:root { --grain-1: #2a2a2a; --grain-2: #141414; --grain-3: #050505; color-scheme: dark; }
+html.light {
+  --color-bg: #fbf7f1; --color-fg: #1c1917;
+  --color-card: #ffffff; --color-card-2: #f4ede4; --color-line: #e7dccd;
+  --grain-1: #fff1e0; --grain-2: #fbf1e4; --grain-3: #f6ebdc;
+  color-scheme: light;
+}
+@layer components {
+  .bg-brand { color: #fff; }
+  html.light .bg-card { box-shadow: 0 1px 0 var(--color-line), 0 18px 40px -26px rgb(120 70 20 / .35); }
+  html.light .field-dark { background: #fff; }
+}
+html.light ::selection { color: #fff; }
+
+/* circular reveal when switching theme */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { animation: vt-reveal .75s cubic-bezier(.4,0,.2,1) both; }
+@keyframes vt-reveal { from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 0)) } to { clip-path: circle(150vmax at var(--vt-x, 50%) var(--vt-y, 0)) } }
+
+/* ================= languages / RTL ================= */
+html[lang="ar"] { --font-display: "Cairo", "Tajawal", Georgia, serif; --font-body: "Cairo", "Tajawal", Georgia, sans-serif; }
+html[lang="zh"] { --font-display: "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif; --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif; }
+html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] h4 { line-height: 1.35; letter-spacing: 0; }
+html[lang="zh"] h1, html[lang="zh"] h2, html[lang="zh"] h3, html[lang="zh"] h4 { line-height: 1.3; letter-spacing: .02em; }
+[dir="rtl"] .flip-rtl { transform: scaleX(-1); }
+[dir="rtl"] .rtl-rot { rotate: 180deg; }
+
+/* ================= extra motion ================= */
+@keyframes word-in { from { opacity: 0; transform: translateY(.55em) rotate(3deg); } to { opacity: 1; transform: none } }
+.hero-word { opacity: 0; animation: word-in .85s cubic-bezier(.2,.7,.2,1) forwards; }
+@keyframes shimmer { to { background-position: 200% center } }
+.text-shimmer { background: linear-gradient(100deg, var(--color-brand) 20%, #ffc477 45%, var(--color-brand) 70%); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; animation: shimmer 4s linear infinite; }
+@keyframes orb { 0%,100% { transform: translate3d(0,0,0) scale(1) } 50% { transform: translate3d(40px,-30px,0) scale(1.15) } }
+.orb { position: absolute; border-radius: 9999px; background: radial-gradient(circle at 50% 50%, rgb(242 107 13 / .55) 0%, rgb(242 107 13 / .18) 40%, transparent 70%); opacity: .45; pointer-events: none; will-change: transform; animation: orb 16s ease-in-out infinite; }
+html.light .orb { opacity: .35; }
+.sheen { overflow: hidden; }
+.sheen::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 35%, rgb(255 255 255 / .38) 50%, transparent 65%); transform: translateX(-120%); }
+.sheen:hover::after { transform: translateX(120%); transition: transform .8s ease; }
+@keyframes ping-soft { 0% { transform: scale(1); opacity: .6 } 100% { transform: scale(1.9); opacity: 0 } }
+.ping-soft::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; animation: ping-soft 1.8s ease-out infinite; }
+@keyframes bar-stripes { to { background-position: 28px 0 } }
+.bar-live { background-image: linear-gradient(135deg, rgb(255 255 255 / .22) 25%, transparent 25%, transparent 50%, rgb(255 255 255 / .22) 50%, rgb(255 255 255 / .22) 75%, transparent 75%); background-size: 28px 28px; animation: bar-stripes 1s linear infinite; }
+.marquee-mask { mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+.hero-word.text-shimmer { animation: word-in .85s cubic-bezier(.2,.7,.2,1) forwards, shimmer 4s linear infinite; }
+
+/* search input: leave room for the icon (must be unlayered to beat .field padding) */
+.field-search { padding-inline-start: 2.6rem; }
+.field-search::-webkit-search-cancel-button { margin-inline-start: .5rem; }
+
+/* ---------- performance ---------- */
+/* animations pause while their element is off-screen (set by the appInView directive) */
+.is-off, .is-off * { animation-play-state: paused !important; }
+.reveal.in { will-change: auto; }
+.marquee-track { will-change: transform; }
